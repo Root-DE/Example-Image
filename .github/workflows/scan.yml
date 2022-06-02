@@ -46,6 +46,8 @@ jobs:
     #needs: [scan]
     runs-on: ubuntu-latest
     steps:
+    - name: Login to GitHub Container Registry
+      run: echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u root-de --password-stdin
     - name: set dev env
       run: echo "image_tag_dev=$(echo ghcr.io/${{ github.repository }}/dev/test:latest |  tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
     - name: set prod env
