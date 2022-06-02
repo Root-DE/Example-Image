@@ -43,7 +43,7 @@ jobs:
         git commit -m "add sbom and vuln files"
         git push origin HEAD:main
   deploy:
-    #needs: [scan]
+    needs: [scan]
     runs-on: ubuntu-latest
     steps:
     - name: Login to GitHub Container Registry
