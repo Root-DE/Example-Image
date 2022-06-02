@@ -7,8 +7,8 @@ on:
 
 jobs:
   build:
-
-    runs-on: docker://ghcr.io/root-de/applied-cybersecurity/scan:latest
+    runs-on: ubuntu-latest
+    container: ghcr.io/root-de/applied-cybersecurity/scan:latest
 
     steps:
     - uses: actions/checkout@v3
