@@ -1,0 +1,29 @@
+name: Docker Scan
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+
+    runs-on: ghcr.io/root-de/applied-cybersecurity/scan:latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Build
+      run: docker build . -t ${{ github.repository }}
+    - name: get SBOM
+      run: syft ${{ github.repository }} -o json --file sbom.json
+    - name: get Vulnerabilites
+      run: grype sbom.json -o json --file vuln.json
+    - name: push files
+      run: |
+        git config --global user.email "action@github.com"
+        git config --global user.name "GitHub Action"
+        git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+        git checkout -b scans/${{ github.repository }}/$(date +%s)
+        git add sbom.json vuln.json
+        git commit -m "add sbom and vuln files"
+        git push origin HEAD:main
