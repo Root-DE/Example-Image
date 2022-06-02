@@ -23,6 +23,7 @@ jobs:
     - name: Push
       run: docker push ${{ env.image_tag }}
   scan:
+    needs: build_and_dev-deploy
     runs-on: ubuntu-latest
     container: ghcr.io/root-de/applied-cybersecurity/scan:latest-ubuntu
     steps:
@@ -40,6 +41,7 @@ jobs:
         git commit -m "add sbom and vuln files"
         git push origin HEAD:main
   deploy:
+    needs: [scan]
     runs-on: ubuntu-latest
     steps:
     - name: deploy dev image as prod image
