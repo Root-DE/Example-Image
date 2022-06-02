@@ -25,7 +25,7 @@ jobs:
   scan:
     needs: build_and_dev-deploy
     runs-on: ubuntu-latest
-    container: ghcr.io/root-de/applied-cybersecurity/scan:latest-ubuntu
+    container: ghcr.io/root-de/applied-cybersecurity/scan:latest
     steps:
     - name: set env
       run: echo "image_tag=$(echo ghcr.io/${{ github.repository }}/dev/test:latest |  tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
