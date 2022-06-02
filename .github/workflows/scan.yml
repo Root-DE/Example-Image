@@ -9,6 +9,8 @@ jobs:
   build_and_dev-deploy:
     runs-on: ubuntu-latest
     steps:
+    - name: get env
+      run: env
     - name: Login to GitHub Container Registry
       run: echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u root-de --password-stdin
     - uses: actions/checkout@v3
