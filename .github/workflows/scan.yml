@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: set env
-      run: echo "image_tag=$(echo ghcr.io/root-de/${{ github.repository }}/dev/test:latest |  tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+      run: echo "image_tag=$(echo ghcr.io/${{ github.repository }}/dev/test:latest |  tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
     - name: get env
       run: env
     - name: print tag
