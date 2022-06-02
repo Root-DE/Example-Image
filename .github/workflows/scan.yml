@@ -7,7 +7,7 @@ on:
 
 jobs:
   set_env:
-    runs-on: ubtunt-latest
+    runs-on: ubuntu-latest
     steps:
     - name: set env
       run: echo "IMAGE_TAG=$(echo ghcr.io/root-de/${{ github.repository }}/dev/test:latest |  tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
