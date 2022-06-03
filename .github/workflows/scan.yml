@@ -40,11 +40,11 @@ jobs:
         #git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/Root-DE/Applied-Cybersecurity.git
         #git checkout -b scans/${{ github.repository }}/$(date +%s)
         git clone --depth 1 --filter=blob:none --sparse https://github.com/Root-DE/Applied-Cybersecurity
+        cd Applied-Cybersecurity
         git sparse-checkout set ${{ github.repository }}
         ls
-        mv sbom.json ./Applied-Cybersecurity/sbom.json
-        mv vuln.json ./Applied-Cybersecurity/vuln.json
-        cd Applied-Cybersecurity
+        mv ../sbom.json sbom.json
+        mv ../vuln.json vuln.json
         ls
         git add sbom.json vuln.json
         git commit -m "add sbom and vuln files"
