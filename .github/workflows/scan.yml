@@ -46,7 +46,7 @@ jobs:
         mv ../sbom.json sbom.json
         mv ../vuln.json vuln.json
         ls
-        git add sbom.json vuln.json
+        git add --sparse sbom.json vuln.json
         git commit -m "add sbom and vuln files"
         git push origin HEAD:main
         
