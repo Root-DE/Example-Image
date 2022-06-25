@@ -36,12 +36,12 @@ jobs:
     - name: get Vulnerabilites
       run: grype sbom.json -o json --file vuln.json
     - name: zip vuln and sbom
-      run: zip scan.json vuln.json sbom.json
+      run: zip scan.zip vuln.json sbom.json
     - name: upload artifacts
       uses: actions/upload-artifact@v3
       with:
         name: scan
-        path: scan.json
+        path: scan.zip
 
   deploy:
     needs: [scan]
