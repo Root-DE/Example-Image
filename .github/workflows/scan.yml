@@ -39,7 +39,7 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: scan
-        path: *.json
+        path: ./*.json
 
   deploy:
     needs: [scan]
