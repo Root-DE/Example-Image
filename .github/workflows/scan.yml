@@ -24,7 +24,7 @@ jobs:
       run: docker build . -t ${{ env.image_tag_dev }}
     - name: Push
       run: docker push ${{ env.image_tag_dev }}
-  scan:
+  scan: #scan image
     needs: build_and_dev-deploy
     runs-on: ubuntu-latest
     container: ghcr.io/root-de/applied-cybersecurity/scan:latest
@@ -35,23 +35,17 @@ jobs:
       run: syft ${{ env.image_tag_dev }} -o json --file sbom.json
     - name: get Vulnerabilites
       run: grype sbom.json -o json --file vuln.json
-#     - name: push files
-#       run: |
-#         git config --global user.email "action@github.com"
-#         git config --global user.name "GitHub Action"
-#         #git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/Root-DE/Applied-Cybersecurity.git
-#         #git checkout -b scans/${{ github.repository }}/$(date +%s)
-#         git clone --depth 1 --filter=blob:none --sparse https://github.com/Root-DE/Applied-Cybersecurity
-#         cd Applied-Cybersecurity
-#         git sparse-checkout set ${{ github.repository }}
-#         ls
-#         mv ../sbom.json sbom.json
-#         mv ../vuln.json vuln.json
-#         ls
-#         git add --sparse sbom.json vuln.json
-#         git commit -m "add sbom and vuln files"
-#         git push origin HEAD:main
-        
+
+    - name: upload artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: sbom
+        path: sbom.json
+    - name: upload artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: vuln
+        path: vuln.json
   deploy:
     needs: [scan]
     runs-on: ubuntu-latest
