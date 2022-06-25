@@ -35,13 +35,11 @@ jobs:
       run: syft ${{ env.image_tag_dev }} -o json --file sbom.json
     - name: get Vulnerabilites
       run: grype sbom.json -o json --file vuln.json
-    - name: zip vuln and sbom
-      run: zip scan.zip vuln.json sbom.json
     - name: upload artifacts
       uses: actions/upload-artifact@v3
       with:
         name: scan
-        path: scan.zip
+        path: *.json
 
   deploy:
     needs: [scan]
