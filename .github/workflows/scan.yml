@@ -22,22 +22,8 @@ jobs:
       run: docker build . -t ${{ env.image_tag_dev }}
     - name: Push
       run: docker push ${{ env.image_tag_dev }}
-      
-      
-    - uses: anchore/scan-action@v3
-      id: scan
-      with:
-        image: "localbuild/testimage:latest"
-        acs-report-enable: true
-        fail-build: false
-    - name: upload Anchore scan SARIF report
-      uses: github/codeql-action/upload-sarif@v2
-      with:
-        sarif_file: ${{ steps.scan.outputs.sarif }}
-        
 
-
-  scan: #scan image
+  scan:
     needs: build_and_dev-deploy
     runs-on: ubuntu-latest
     container: ghcr.io/root-de/applied-cybersecurity/scan:latest
@@ -53,10 +39,14 @@ jobs:
       with:
         name: scan
         path: ./*.json
+
+  send_scan_results: # needs to be in another job
+    needs: [scan]
+    runs-on: ubuntu-latest
+    container: ghcr.io/root-de/applied-cybersecurity/scan:latest
+    steps: 
     - name: notify listener
       run: send_script.sh
-  
-  
 
   deploy:
     needs: [scan]
