@@ -39,12 +39,6 @@ jobs:
       with:
         name: scan
         path: ./*.json
-
-  send_scan_results: # needs to be in another job
-    needs: [scan]
-    runs-on: ubuntu-latest
-    container: ghcr.io/root-de/applied-cybersecurity/scan:latest
-    steps: 
     - name: notify listener
       run: send_script.sh
 
