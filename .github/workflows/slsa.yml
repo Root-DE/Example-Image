@@ -27,10 +27,10 @@ jobs:
       run: docker push ${{ env.image_tag_dev }}
     # TODO: check if id is the right one or maybe hash the output from docker inspect
     - name: get hashes
-      run: docker inspect --format='{{index .RepoDigests 0}}' python:latest | cut -d':' -f2 > hash
+      run: docker inspect ${{ env.image_tag_dev }} > artifact
     - name: encode hash
       id: hash
-      run: echo "::set-output name=hashes::$(hash | base64 -w0)"
+      run: echo "::set-output name=hashes::$(sha256sum artifact | base64 -w0)"
   
   # This step calls the generic workflow to generate provenance.
   provenance:
