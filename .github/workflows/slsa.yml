@@ -47,7 +47,6 @@ jobs:
   release:
     needs: [build, provenance]
     runs-on: ubuntu-latest
-    #if: startsWith(github.ref, 'refs/tags/')
     steps:
       - name: Download provenance
         uses: actions/download-artifact@fb598a63ae348fa914e94cd0ff38f362e927b741 # tag=v2.1.0
@@ -56,9 +55,10 @@ jobs:
           # our provenance.
           name: ${{needs.provenance.outputs.attestation-name}}
 
-      - name: Create release
-        uses: softprops/action-gh-release@1e07f4398721186383de40550babbdf2b84acfc5 # tag=v0.1.14
+      - name: Create artifact
+        uses: actions/upload-artifact@v1
         with:
-          files: |
-            ${{needs.provenance.outputs.attestation-name}}
+          name: ${{needs.provenance.outputs.attestation-name}}
+          path: ${{needs.provenance.outputs.attestation-name}}
+      
       
