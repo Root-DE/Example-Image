@@ -1,6 +1,7 @@
 name: SLSA for Docker Images
 
 on:
+  release:
   push:
     branches: [ main ]
   schedule:
