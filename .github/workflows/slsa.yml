@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       IMAGE_REGISTRY: ghcr.io
-      IMAGE_NAME: ghcr.io/root-de/example-image/dev/test:latest
+      IMAGE_NAME: root-de/example-image/dev/test:latest
     steps:
       - name: Checkout the repository
         uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # v2.3.4
