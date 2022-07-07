@@ -1,28 +1,64 @@
-name: CI
+name: SLSA for Docker Images
 
 on:
   push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
-
+    branches: [ main ]
+  schedule:
+    - cron:  '0 8 * * *'
   workflow_dispatch:
+  
 
 jobs:
   build:
+    outputs:
+      hashes: ${{ steps.hash.outputs.hashes }}
     runs-on: ubuntu-latest
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - name: checkout
-        uses: actions/checkout@v3
+    - name: set dev env
+      run: echo "image_tag_dev=$(echo ghcr.io/${{ github.repository }}/dev/test:latest |  tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+    - name: get env
+      run: env
+    - name: Login to GitHub Container Registry
+      run: echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u root-de --password-stdin
+    - uses: actions/checkout@v3
+    - name: Build
+      run: docker build . -t ${{ env.image_tag_dev }}
+    - name: Push
+      run: docker push ${{ env.image_tag_dev }}
+    # TODO: check if id is the right one or maybe hash the output from docker inspect
+    - name: get hashes
+      run: docker inspect --format='{{index .RepoDigests 0}}' python:latest | cut -d':' -f2 > hash
+    - name: encode hash
+      id: hash
+      run: echo "::set-output name=hashes::$(hash | base64 -w0)"
+  
+  # This step calls the generic workflow to generate provenance.
+  provenance:
+    needs: [build]
+    permissions:
+      actions: read
+      id-token: write
+      contents: read
+    uses: slsa-framework/slsa-github-generator/.github/workflows/generator_generic_slsa3.yml@v1.1.1
+    with:
+      base64-subjects: "${{ needs.build.outputs.hashes }}"
+  
+  # This step creates a GitHub release with our artifacts and provenance.
+  release:
+    needs: [build, provenance]
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    steps:
+      - name: Download provenance
+        uses: actions/download-artifact@fb598a63ae348fa914e94cd0ff38f362e927b741 # tag=v2.1.0
+        with:
+          # The provenance step returns an output with the artifact name of
+          # our provenance.
+          name: ${{needs.provenance.outputs.attestation-name}}
 
-      - name: Generate provenance
-        uses: slsa-framework/github-actions-demo@v0.1
+      - name: Create release
+        uses: softprops/action-gh-release@1e07f4398721186383de40550babbdf2b84acfc5 # tag=v0.1.14
         with:
-          artifact_path: artifact/
-    
-      - name: Upload provenance
-        uses: actions/upload-artifact@v2
-        with:
-          name: my-artifact
-          path: build.provenance
+          files: |
+            ${{needs.provenance.outputs.attestation-name}}
+      
