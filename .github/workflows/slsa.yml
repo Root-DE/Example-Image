@@ -70,6 +70,10 @@ jobs:
     steps:
     - name: env
       run: env
+    - name: echo1
+      run: echo ${{ needs.build.outputs.image }}
+    - name: echo2
+      run: echo ${{ github.actor }}
 #     uses: slsa-framework/slsa-github-generator/.github/workflows/generator_container_slsa3.yml@main
 #     with:
 #       image: ${{ needs.build.outputs.image }}
