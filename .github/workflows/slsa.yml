@@ -7,7 +7,10 @@ on:
   schedule:
     - cron:  '0 8 * * *'
   workflow_dispatch:
-  
+
+env:
+  IMAGE_REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
 
 jobs:
   # This step builds our image, pushes it, and outputs the repo hash digest.
@@ -16,12 +19,8 @@ jobs:
       contents: read
       packages: write
     outputs:
-      tag: ${{ steps.hash.outputs.tag }}
-      sha: ${{ steps.hash.outputs.sha }}
+      image: ${{ steps.image.outputs.image }}
     runs-on: ubuntu-latest
-    env:
-      IMAGE_REGISTRY: ghcr.io
-      IMAGE_NAME: root-de/example-image/dev/test
     steps:
       - name: Checkout the repository
         uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # v2.3.4
@@ -50,35 +49,28 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
-      - name: Output digest
-        id: hash
-        env:
-          IMAGE_TAGS: ${{ steps.meta.outputs.tags }}
-          SHA: ${{ steps.build.outputs.digest }}
+      - name: Output image
+        id: image
         run: |
-          # sha output of docker/build-push-action is of the form 'sha256:<digest>'
-          sha=$(echo $SHA | cut -d':' -f2)
-          # docker/build-push-action outputs multiple tags including latest.
-          # It seems to put latest at the end of the list.
-          tag=$(echo "$IMAGE_TAGS" | head -n1)
-          echo "::set-output name=tag::$tag"
-          echo "::set-output name=sha::$sha"
+          # NOTE: Set the image as an output because the `env` context is not
+          # available to the inputs of a reusable workflow call.
+          image_name="${IMAGE_REGISTRY}/${IMAGE_NAME}"
+          echo "::set-output name=image::$image_name"
 
   # This step calls the container workflow to generate provenance and push it to
   # the container registry.
   provenance:
     needs: [build]
     permissions:
-      actions: read
-      id-token: write
-      packages: write
+      actions: read # for detecting the Github Actions environment.
+      id-token: write # for creating OCID tokens for signing.
+      packages: write # for uploading attestations.
     if: startsWith(github.ref, 'refs/tags/')
     uses: slsa-framework/slsa-github-generator/.github/workflows/generator_container_slsa3.yml@main
     with:
-      # XXX: should this use the sha instead of the tag?
-      image: ${{ needs.build.outputs.tag }}
+      image: ${{ needs.build.outputs.image }}
       registry-username: ${{ github.actor }}
       # TODO(https://github.com/slsa-framework/slsa-github-generator/issues/492): Remove after GA release.
-      compile-generator: true
+      compile-generator: false
     secrets:
       registry-password: ${{ secrets.GITHUB_TOKEN }}
