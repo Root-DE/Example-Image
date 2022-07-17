@@ -20,6 +20,7 @@ jobs:
       packages: write
     outputs:
       image: ${{ steps.image.outputs.image }}
+      digest: ${{ steps.build.outputs.digest }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout the repository
@@ -56,6 +57,7 @@ jobs:
           # available to the inputs of a reusable workflow call.
           image_name="${IMAGE_REGISTRY}/${IMAGE_NAME}"
           echo "::set-output name=image::$image_name"
+        
 
   # This step calls the container workflow to generate provenance and push it to
   # the container registry.
@@ -78,7 +80,7 @@ jobs:
     with:
       image: ${{ needs.build.outputs.image }}
       registry-username: ${{ github.actor }}
-      digest: ${{docker inspect --format '{{ .RepoDigests }}' $IMAGE_NAME | cut -d '[' -f 2 | cut -d ']' -f 1}}
+      digest: ${{ needs.build.outputs.digest }}
       # TODO(https://github.com/slsa-framework/slsa-github-generator/issues/492): Remove after GA release.
       compile-generator: true
     secrets:
