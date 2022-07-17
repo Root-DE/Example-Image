@@ -81,6 +81,6 @@ jobs:
       registry-username: ${{ github.actor }}
       digest: ${{ needs.build.outputs.digest }}
       # TODO(https://github.com/slsa-framework/slsa-github-generator/issues/492): Remove after GA release.
-      compile-generator: false
+      compile-generator: true # false currently don't work
     secrets:
       registry-password: ${{ secrets.GITHUB_TOKEN }}
