@@ -54,7 +54,7 @@ jobs:
         run: |
           # NOTE: Set the image as an output because the `env` context is not
           # available to the inputs of a reusable workflow call.
-          image_name="${IMAGE_REGISTRY}/${IMAGE_NAME}"
+          image_name="$(echo ${IMAGE_REGISTRY}/${IMAGE_NAME} | tr '[:upper:]' '[:lower:]')" 
           echo "::set-output name=image::$image_name"
         
 
