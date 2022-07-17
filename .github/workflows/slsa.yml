@@ -2,8 +2,7 @@ name: SLSA for Docker Images
 
 on:
   release:
-  push:
-    branches: [ main ]
+    types: [published]
   schedule:
     - cron:  '0 8 * * *'
   workflow_dispatch:
