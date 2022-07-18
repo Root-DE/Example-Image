@@ -7,7 +7,4 @@ on:
 
 jobs:
   scanPush:
-    runs-on: ubuntu-latest
-    steps:
-      - name: scanPush
-        uses: root-de/scan-action/.github/workflows/scan.yml@main        
+    uses: root-de/scan-action/.github/workflows/scan.yml@main        
