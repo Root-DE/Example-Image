@@ -1,0 +1,13 @@
+name: CI
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  scanPush:
+    runs-on: ubuntu-latest
+    steps:
+      - name: scanPush
+        uses: root-de/scan-action/main/action.yml@main
