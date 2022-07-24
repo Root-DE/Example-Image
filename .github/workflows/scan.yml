@@ -1,6 +1,8 @@
 name: Scan
 
 on:
+  release:
+    types: [published]
   push:
     branches: [ "main" ]
   schedule:
